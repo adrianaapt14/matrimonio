@@ -659,9 +659,18 @@ function iniciar(){
   info();
   actualizarEstado();
 }
+// Mientras llegan los datos: el sobre ya responde al toque (se abre apenas estén listos)
+var clicPendiente = false;
+document.body.classList.add('tema-piedra');
+(new Image()).src = 'invitacion.jpg';
+document.getElementById('sobre').addEventListener('click', function(){
+  if (DATA) return;
+  clicPendiente = true;
+  document.querySelector('.pista').textContent = 'Abriendo tu invitación…';
+});
 (function cargar(intento){
   var f = (location.search.match(/[?&]f=([^&]+)/) || [])[1] || '';
-  SITIO.pedir('api=datos&f=' + encodeURIComponent(f)).then(function(d){ DATA = d; iniciar(); }, function(){
+  SITIO.pedir('api=datos&f=' + encodeURIComponent(f)).then(function(d){ DATA = d; iniciar(); if (clicPendiente) document.getElementById('sobre').click(); }, function(){
     if (intento < 2) return setTimeout(function(){ cargar(intento + 1); }, 1500);
     document.querySelector('.pista').textContent = 'No pudimos cargar la invitación. Revisa tu conexión y vuelve a intentar.';
   });
